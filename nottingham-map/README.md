@@ -1,5 +1,5 @@
 # [Map of Nottingham](https://bl.ocks.org/owen8877/6de893c1f542bd8dcba74d76b1203043)
-![preview.jpg](By xDroid)
+_By xDroid_
 
 _Data based on our mcm thesis._
 
