@@ -1,4 +1,6 @@
-# Map of Nottingham
+# [Map of Nottingham](https://bl.ocks.org/owen8877/6de893c1f542bd8dcba74d76b1203043)
+![preview.jpg](By xDroid)
+
 _Data based on our mcm thesis._
 
 ## Introduction
