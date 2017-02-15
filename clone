@@ -1,0 +1,13 @@
+#!/bin/sh
+if [ -z $2 ]
+then
+	echo "Usage: clone [gist_id] [github_username]"
+	exit
+fi
+
+git clone ssh://git@gist.github.com/$1
+DESC=`cat $1/README.md | sed -e 's/# \(.*\)/\1/g'`
+DESC_=`echo $DESC | sed -e 's/ /-/g'`
+mv $1/ $DESC_/
+cp template/.* template/* $DESC_/
+sed -e 's/_____/'"$DESC"'/' -e 's/gist_id/'"$1"'/' -e 's/__name__/'"$2"'/g' -i $DESC_/README.md 
