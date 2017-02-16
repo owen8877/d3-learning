@@ -1,13 +1,16 @@
 #!/bin/sh
-if [ -z $2 ]
+if [ -z $1 ]
 then
-	echo "Usage: clone [gist_id] [github_username]"
+	echo "Usage: clone [github_username/gist_id]"
 	exit
 fi
 
-git clone ssh://git@gist.github.com/$1
-DESC=`cat $1/README.md | sed -e 's/# \(.*\)/\1/g'`
+NAME=`echo $1 | sed -e 's#\([^/]*\)/.*#\1#g'`
+ID=`echo $1 | sed -e 's#[^/]*/\(.*\)#\1#g'`
+
+git clone ssh://git@gist.github.com/$ID
+DESC=`cat $ID/README.md | sed -e 's/# \(.*\)/\1/g'`
 DESC_=`echo $DESC | sed -e 's/ /-/g'`
-mv $1/ $DESC_/
+mv $ID/ $DESC_/
 cp template/.* template/* $DESC_/
-sed -e 's/_____/'"$DESC"'/' -e 's/gist_id/'"$1"'/' -e 's/__name__/'"$2"'/g' -i $DESC_/README.md 
+sed -e 's/_____/'"$DESC"'/' -e 's/gist_id/'"$ID"'/' -e 's/__name__/'"$NAME"'/g' -i $DESC_/README.md 
