@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="//danlevan.github.io/google-material-color/dist/palette.css" type="text/css" />
+<style>
+</style>
+</head>
+<body>
+  <svg class="chart"></svg>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="//danlevan.github.io/google-material-color/dist/palette.js"></script>
+<script>
+/* global d3 */
+/* global palette */
+
+const interval = 0.2
+const dimension = {width: 960, height: 500, margin: {top: 20, right: 20, bottom: 30, left: 50}}
+
+let chart = d3.select('svg')
+  .attr('width', dimension.width)
+  .attr('height', dimension.height)
+let g = chart.append('g')
+  .attr('transform', `translate(${dimension.margin.left}, ${dimension.margin.top})`)
+
+d3.json("data.json", (error, data) => {
+  let tScale = d3.scaleLinear()
+    .range([0, dimension.width - dimension.margin.left - dimension.margin.right])
+  
+  let flatMap = function(array, lambda) { 
+    return Array.prototype.concat.apply([], array.map(lambda)) 
+  }
+  let aScale = d3.scaleLinear()
+    .range([dimension.height - dimension.margin.top - dimension.margin.bottom, 0])
+  
+  let colors = ['Blue', 'Orange', 'Green']
+  let lines = [0, 1, 2].map(n =>
+    {
+      return {
+        line: d3.line()
+          .x((d, i) => tScale(i))
+          .y((d, i) => aScale(d[n])),
+        color: palette.get(colors[n])
+      }
+    }
+  )
+  
+  tScale.domain([0, data.length])
+  aScale.domain(d3.extent(flatMap(data, d => d)))
+
+  g.append("g")
+      .attr("transform", `translate(0, ${dimension.height - dimension.margin.top - dimension.margin.bottom})`)
+      .call(d3.axisBottom(tScale))
+    .select(".domain")
+      .remove()
+
+  g.append("g")
+      .call(d3.axisLeft(aScale))
+    .append("text")
+      .attr("fill", "#000")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Acceleration")
+
+  lines.map(line =>
+    g.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", line.color)
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-width", 1.5)
+      .attr("d", line.line)
+  )
+})
+</script>
+</body>
