@@ -15,17 +15,21 @@
 </style> 
 </head>
 <body>
-<div class="chart">
-  <div style="width: 50px;">5</div>
-  <div style="width: 100px;">10</div>
-  <div style="width: 150px;">15</div>
-  <div style="width: 200px;">20</div>
-  <div style="width: 250px;">25</div>
-</div>
-<script src="//d3js.org/d3.v4.min.js"></script>
+<div class="chart"></div>
+<script src="https://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript">
 /* global d3 */
-var data = [5, 10, 15, 20, 25]
+var data = [5, 10, 15, 20, 25];
+var x = d3.scale.linear()
+    .domain([0, d3.max(data)])
+    .range([0, 420]);
+
+d3.select(".chart")
+  .selectAll("div")
+  .data(data)
+  .enter().append('div')
+  .style("width", function(d){return x(d) +"px";})
+  .text(function(d){return d;});
 
 </script> 
 
