@@ -2,31 +2,26 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="//danlevan.github.io/google-material-color/dist/palette.css" type="text/css" />
-<title>A simple chart!</title>
 <style>
-.chart div{
-  font: 10px sans-serif;
-  background-color: steelblue;
-  text-align: right;
-  padding: 3px;
-  margin: 1px;
-  color: white;
-}
 </style> 
+<title>this is my first html</title>
 </head>
 <body>
-<div class="chart">
-  <div style="width: 50px;">5</div>
-  <div style="width: 100px;">10</div>
-  <div style="width: 150px;">15</div>
-  <div style="width: 200px;">20</div>
-  <div style="width: 250px;">25</div>
-</div>
 <script src="//d3js.org/d3.v4.min.js"></script>
+<p>this is a simple example.</p>
+<p>I'm going to make a simple chart.</p>
+<p>but there are many things to learn.</p>
+<p>why does this happen.</p>
+<p>this is very strange.</p>
+<p>this text will be very large.</p>
 <script type="text/javascript">
 /* global d3 */
-var data = [5, 10, 15, 20, 25]
-
+d3.select("body")
+  .selectAll("p")
+  .data([4, 8, 15, 16, 23, 42])
+  .style("font-size", function(d) { return d + "px"; })
+  .enter().append("p")
+    .text(function(d) { return "I’m number " + d + "!"; });
 </script> 
 
 </body>
