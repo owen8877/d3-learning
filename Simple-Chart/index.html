@@ -2,19 +2,12 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="//danlevan.github.io/google-material-color/dist/palette.css" type="text/css" />
-<title>A simple chart!</title>
 <style>
-.chart div{
-  font: 10px sans-serif;
-  background-color: steelblue;
-  text-align: right;
-  padding: 3px;
-  margin: 1px;
-  color: white;
-}
 </style> 
+<title>this is my first html</title>
 </head>
 <body>
+<<<<<<< HEAD
 <div class="chart"></div>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript">
@@ -31,6 +24,23 @@ d3.select(".chart")
   .style("width", function(d){return x(d) +"px";})
   .text(function(d){return d;});
 
+=======
+<script src="//d3js.org/d3.v4.min.js"></script>
+<p>this is a simple example.</p>
+<p>I'm going to make a simple chart.</p>
+<p>but there are many things to learn.</p>
+<p>why does this happen.</p>
+<p>this is very strange.</p>
+<p>this text will be very large.</p>
+<script type="text/javascript">
+/* global d3 */
+d3.select("body")
+  .selectAll("p")
+  .data([4, 8, 15, 16, 23, 42])
+  .style("font-size", function(d) { return d + "px"; })
+  .enter().append("p")
+    .text(function(d) { return "I’m number " + d + "!"; });
+>>>>>>> 7c29fba606b8cdfd19989face4a8acbdcbeab28d
 </script> 
 
 </body>
