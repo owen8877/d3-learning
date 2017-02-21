@@ -84,7 +84,7 @@ d3.tsv("nottingham.tsv")
   return d
 })
 .get((error, data) => {
-  scale = d3.scale.linear()
+  scale = d3.scaleLinear()
     .domain([0, d3.max(data, d => Math.max(d.x, d.y))])
     .range([0, chartDimension.width])
     
@@ -139,12 +139,10 @@ function busConnection(blockSelection, data) {
   directions.map(direction => {
     blockSelection
       .append('line')
-      .attr({
-        x1: 0.5,
-        y1: 0.5,
-        x2: 0.5 * (1 + direction.dx),
-        y2: 0.5 * (1 + direction.dy)
-      })
+      .attr('x1', 0.5)
+      .attr('y1', 0.5)
+      .attr('x2', 0.5 * (1 + direction.dx))
+      .attr('y2', 0.5 * (1 + direction.dy))
       .style('visibility', d => {
         if (!d.bus)
           return 'collapse'
