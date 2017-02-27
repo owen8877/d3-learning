@@ -3,44 +3,72 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="//danlevan.github.io/google-material-color/dist/palette.css" type="text/css" />
 <style>
+.bar{
+  fill: steelblue;
+}
+
+.bar:hover {
+  fill: brown;
+}
+
+.axis--x path {
+  display: none;
+}
+.axis text {
+  font: 5px sans-serif;
+}
 </style> 
-<title>this is my first html</title>
+<title>China's population change over the past 65 years</title>
 </head>
 <body>
-<<<<<<< HEAD
-<div class="chart"></div>
-<script src="https://d3js.org/d3.v3.min.js"></script>
-<script type="text/javascript">
-/* global d3 */
-var data = [5, 10, 15, 20, 25];
-var x = d3.scale.linear()
-    .domain([0, d3.max(data)])
-    .range([0, 420]);
-
-d3.select(".chart")
-  .selectAll("div")
-  .data(data)
-  .enter().append('div')
-  .style("width", function(d){return x(d) +"px";})
-  .text(function(d){return d;});
-
-=======
+<svg width='960' height='500'></svg>
 <script src="//d3js.org/d3.v4.min.js"></script>
-<p>this is a simple example.</p>
-<p>I'm going to make a simple chart.</p>
-<p>but there are many things to learn.</p>
-<p>why does this happen.</p>
-<p>this is very strange.</p>
-<p>this text will be very large.</p>
 <script type="text/javascript">
 /* global d3 */
-d3.select("body")
-  .selectAll("p")
-  .data([4, 8, 15, 16, 23, 42])
-  .style("font-size", function(d) { return d + "px"; })
-  .enter().append("p")
-    .text(function(d) { return "I’m number " + d + "!"; });
->>>>>>> 7c29fba606b8cdfd19989face4a8acbdcbeab28d
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom
+    
+var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+    y = d3.scaleLinear().range([height, 0])
+    
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    
+d3.tsv('data.tsv', d => {
+  d.population = +d.population
+  d.year = +d.year
+  return d
+}, function(error, data){
+  x.domain(data.map(d => d.year))
+  y.domain([0, d3.max(data, d => d.population)])
+  g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+    .append("text")
+      .attr("text-anchor", "end")
+      .attr("year")
+  g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y).ticks(10))
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Population");
+  g.selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.year); })
+      .attr("y", function(d) { return y(d.population); })
+      .attr("width", x.bandwidth())
+      .attr("height", function(d) { return height - y(d.population); });
+})
+
 </script> 
 
 </body>
