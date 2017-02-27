@@ -3,11 +3,77 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="//danlevan.github.io/google-material-color/dist/palette.css" type="text/css" />
 <style>
+.city path{
+  fill: black;
+}
+
+.map path{
+  fill: red;
+  fill-opacity: 0.7;
+}
+
+.city-label text{
+  fill-opacity: 0.8;
+}
 </style>
 </head>
 <body>
+  <svg></svg>
 <script src="//d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
 <script src="//danlevan.github.io/google-material-color/dist/palette.js"></script>
 <script>
+/* global d3 */
+/* global topojson */
+
+const dimension = {width: 960, height: 500}
+
+let svg = d3.select('svg')
+  .attr('width', `${dimension.width}px`)
+  .attr('height', `${dimension.height}px`)
+
+d3.json('china.json', (error, china) => {
+  if (error) throw error
+  
+  let subunits = topojson.feature(china, china.objects.subunits)
+  let places = topojson.feature(china, china.objects.places)
+  
+  let projection = d3.geoMercator()
+    .scale(600)
+    .center([104, 38])
+    
+  let path = d3.geoPath().projection(projection)
+    
+  // drawing the base map
+  svg
+    .append('g')
+      .attr('class', 'map')
+      .selectAll('path')
+        .data(subunits.features)
+      .enter()
+        .append('path')
+          .attr("d", path)
+  
+  // drawing cities
+  svg
+    .append("path")
+      .datum(places)
+      .attr("d", path.pointRadius(3))
+      .attr("class", "city")
+      
+  svg
+    .selectAll(".city-label")
+      .data(places.features)
+    .enter()
+      .append("text")
+        .attr("class", "city-label")
+        .attr("transform", d => `translate(${projection(d.geometry.coordinates)})`)
+        .attr("dy", ".35em")
+        .text(d => d.properties.NAME)
+        
+  svg.selectAll(".city-label")
+    .attr("x", d => d.geometry.coordinates[0] > 115 ? 6 : -6)
+    .style("text-anchor", d => d.geometry.coordinates[0] > 115 ? "start" : "end");
+})
 </script>
 </body>
