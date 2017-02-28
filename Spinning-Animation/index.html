@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="//danlevan.github.io/google-material-color/dist/palette.css" type="text/css" />
+<style>
+.moving {
+  fill: #2196F3;
+}
+
+.hint circle{
+  fill: #EEEEEE;
+}
+
+.hint text{
+  fill: #AAAAAA;
+  font-size: 20pt;
+}
+</style>
+</head>
+<body>
+  <button onclick="switchAnimation()">Switch Animation</button>
+  <button onclick="switchHint()">Switch Hint</button>
+  <form oninput="adjustParameter(parseFloat(alphaInput.value), parseFloat(betaInput.value), parseFloat(intervalInput.value), parseInt(circleNumberInput.value)); betaOutput.value = betaInput.value; alphaOutput.value = alphaInput.value; intervalOutput.value = intervalInput.value; circleNumberOutput.value = circleNumberInput.value">
+    <input type="range" id="alphaInput" min="0" max="0.5" step="0.01" value="0.45"> alpha: <output id="alphaOutput">0.45</output>
+    <br>
+    <input type="range" id="betaInput" min="0" max="0.5" step="0.005" value="0.06"> beta: <output id="betaOutput">0.06</output>
+    <br>
+    <input type="range" id="intervalInput" min="0" max="0.5" step="0.01" value="0.07"> interval: <output id="intervalOutput">0.07</output>
+    <br>
+    <input type="range" id="circleNumberInput" min="1" max="10" step="1" value="5"> circleNumber: <output id="circleNumberOutput">5</output>
+  </form>
+  <svg></svg>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="//danlevan.github.io/google-material-color/dist/palette.js"></script>
+<script>
+/* global d3 */
+const getArray = N => Array.from(Array(N).keys())
+
+const config = {
+  width: 960,
+  height: 500,
+  circleRadius: 20,
+  orbitRadius: 200,
+  period: 2000,
+}
+
+let svg = d3.select('svg')
+  .attr("width", `${config.width}px`)
+  .attr("height", `${config.height}px`)
+  
+let hintCirclesG, circlesG
+
+let alpha, beta, interval, circleNumber
+adjustParameter(0.45, 0.06, 0.07, 5)
+function adjustParameter(_alpha, _beta, _interval, _circleNumber) {
+  alpha = _alpha
+  beta = _beta
+  interval = _interval
+  if (circleNumber != _circleNumber) {
+    circleNumber = _circleNumber
+    svg.selectAll('.moving').remove()
+    svg.selectAll('.hint').remove()
+    init(circleNumber)
+  }
+  drawHintCircles()
+}
+
+function init(N) {
+  let hintCirclesG = svg.selectAll('g')
+      .data(getArray(N))
+    .enter()
+      .append('g')
+        .attr('class', 'hint')
+
+  hintCirclesG
+    .append('circle')
+      .attr('r', config.circleRadius)
+  
+  hintCirclesG
+    .append('text')
+      .text(d => d)
+      .attr('dx', '-0.3em')
+      .attr('dy', '0.35em')
+    
+  svg.selectAll('.moving')
+      .data(getArray(N))
+    .enter()
+      .append('circle')
+        .attr('class', 'moving')
+        .attr('r', config.circleRadius)
+
+  circlesG = svg.selectAll('.moving')
+}
+
+function drawHintCircles() {
+  svg.selectAll('.hint')
+    .attr('transform', d => {
+      let coordinate = calculateCoordinate(circlePhase((d + 0.0) / circleNumber))
+      return `translate(${coordinate.x}, ${coordinate.y})`
+    })
+}
+
+let hintVisible = true
+function switchHint() {
+  hintVisible = !hintVisible
+  d3.selectAll('.hint')
+    .attr('visibility', hintVisible ? 'visible' : 'hidden')
+}
+
+function circlePhase(t) {
+  t = (t % 1.0 + 1.0) % 1.0
+  let reverse = t > 0.5
+  if (reverse) t = 1 - t
+  const D = -8 + 10 * beta + 8 * alpha,
+    C = 8 - 11 * beta - 8 * alpha,
+    B = 3 * beta,
+    A = alpha
+  let phase = [[D, 4], [C, 3], [B, 2], [A, 1]].reduce((acc, curr) => acc + curr[0] * Math.pow(t, curr[1]), 0)
+  return reverse ? (1 - phase) : phase
+}
+
+let animationOn = true
+function switchAnimation() {
+  if (animationOn) {
+    window.cancelAnimationFrame(animationId)
+  } else {
+    animationId = window.requestAnimationFrame(animation)
+  }
+  animationOn = !animationOn
+}
+
+// just begin to draw
+
+let animationId = requestAnimationFrame(animation)
+
+let baseTime = null
+
+function animation(_time) {
+  animationId = requestAnimationFrame(animation)
+  
+  if (baseTime == null) baseTime = _time
+  let unitTime = ((_time - baseTime) / config.period) % 1.0
+  
+  let x, y
+  
+  let phase = circlePhase(unitTime)
+  let coordinate = calculateCoordinate(phase)
+  
+  circlesG.attr('cx', (d, i) => calculateCoordinate(circlePhase(unitTime - interval * (i - 1))).x)
+  circlesG.attr('cy', (d, i) => calculateCoordinate(circlePhase(unitTime - interval * (i - 1))).y)
+  circlesG.style('fill-opacity', (d, i) => 1 - 0.3 * Math.cos(2 * Math.PI * circlePhase(unitTime - interval * (i - 1))))
+}
+
+function calculateCoordinate(phase) {
+  return {
+    x: config.width / 2 - Math.sin(2 * Math.PI * phase) * config.orbitRadius,
+    y: config.height / 2 - Math.cos(2 * Math.PI * phase) * config.orbitRadius
+  }
+}
+</script>
+</body>
