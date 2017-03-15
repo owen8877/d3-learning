@@ -18,12 +18,13 @@
 <script src="//danlevan.github.io/google-material-color/dist/palette.js"></script>
 <script>
 /* global d3 */
+/* global palette */
 let circles = []
 
 const config = {
   width: 960,
   height: 500,
-  MaxRadius: 50,
+  MaxRadius: 30,
   radiusRatio: 0.8,
 }
 
@@ -38,9 +39,9 @@ function permittableRadius(circle, newCircle) {
 
 function generateCircle(circles) {
   while (true) {
-    let newCircle = {x: Math.random() * config.width, y: Math.random() * config.height, r: -1}
+    let newCircle = {x: 100 + Math.random() * 350, y: 150 + Math.random() * 300, r: -1}
     let permitRadius = Math.min(...circles.map(circle => permittableRadius(circle, newCircle)), config.MaxRadius)
-    console.log({newCircle, permitRadius})
+    //console.log({newCircle, permitRadius})
     if (permitRadius <= 0) continue
     newCircle.r = permitRadius * config.radiusRatio
     return newCircle
@@ -50,7 +51,7 @@ function generateCircle(circles) {
 let animationId = requestAnimationFrame(refresh)
 
 function refresh() {
-  animationId = requestAnimationFrame(refresh)
+  if (circles.length <= 4000) animationId = requestAnimationFrame(refresh)
   let newCircle = generateCircle(circles)
   circles.push(newCircle)
   
@@ -60,6 +61,7 @@ function refresh() {
     .attr('cy', d => d.y)
     .attr('r', d => d.r)
     .attr('clip-path', 'url(#pi)')
+    .attr('fill', palette.random(500))
 }
 
 </script>
