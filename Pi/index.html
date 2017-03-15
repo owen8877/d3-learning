@@ -6,8 +6,61 @@
 </style>
 </head>
 <body>
+  <svg>
+    <defs>
+      <clipPath id="pi">
+        <path d="M112.06 209.23Q148.44 177.00 205.08 177.00L328.13 177.00Q364.50 177.00 384.52 155.52L406.49 187.99Q383.06 212.40 324.46 213.13Q286.62 332.28 286.62 362.06Q286.62 385.50 307.13 385.50Q341.80 385.50 377.44 329.59L403.56 360.11Q354.74 424.56 305.18 424.56Q248.05 424.56 248.05 371.09Q248.05 351.07 258.06 315.67Q258.79 312.99 267.09 283.20Q283.20 222.66 285.64 214.11L233.64 214.11Q211.67 274.66 177.49 381.10L166.50 414.55L118.65 414.55Q158.94 325.93 195.56 215.09Q160.16 215.82 133.54 241.70L112.06 209.23Z"/>
+      </clipPath>
+    </defs>
+    
+  </svg>
 <script src="//d3js.org/d3.v4.min.js"></script>
 <script src="//danlevan.github.io/google-material-color/dist/palette.js"></script>
 <script>
+/* global d3 */
+let circles = []
+
+const config = {
+  width: 960,
+  height: 500,
+  MaxRadius: 50,
+  radiusRatio: 0.8,
+}
+
+let svg = d3.select('svg')
+  .attr("width", `${config.width}px`)
+  .attr("height", `${config.height}px`)
+
+function permittableRadius(circle, newCircle) {
+  let distance = Math.sqrt(Math.pow(circle.x - newCircle.x, 2) + Math.pow(circle.y - newCircle.y, 2))
+  return distance - circle.r
+}
+
+function generateCircle(circles) {
+  while (true) {
+    let newCircle = {x: Math.random() * config.width, y: Math.random() * config.height, r: -1}
+    let permitRadius = Math.min(...circles.map(circle => permittableRadius(circle, newCircle)), config.MaxRadius)
+    console.log({newCircle, permitRadius})
+    if (permitRadius <= 0) continue
+    newCircle.r = permitRadius * config.radiusRatio
+    return newCircle
+  }
+}
+
+let animationId = requestAnimationFrame(refresh)
+
+function refresh() {
+  animationId = requestAnimationFrame(refresh)
+  let newCircle = generateCircle(circles)
+  circles.push(newCircle)
+  
+  svg.append('circle')
+    .datum(newCircle)
+    .attr('cx', d => d.x)
+    .attr('cy', d => d.y)
+    .attr('r', d => d.r)
+    .attr('clip-path', 'url(#pi)')
+}
+
 </script>
 </body>
